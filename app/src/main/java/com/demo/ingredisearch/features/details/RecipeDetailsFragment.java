@@ -12,10 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.demo.ingredisearch.R;
+import com.demo.ingredisearch.RecipeApplication;
 import com.demo.ingredisearch.models.Recipe;
 import com.demo.ingredisearch.util.Resource;
 import com.demo.ingredisearch.util.ViewHelper;
@@ -71,12 +73,10 @@ public class RecipeDetailsFragment extends Fragment {
     }
 
     private void createViewModel() {
-    // TODO: uncomment below four lines
-
-//        RecipeApplication app = (RecipeApplication) requireActivity().getApplication();
-//        mViewModel = new ViewModelProvider(this,
-//                new RecipeDetailsViewModelFactory(app.getInjection().getRecipeRepository()))
-//                .get(RecipeDetailsViewModel.class);
+        RecipeApplication app = (RecipeApplication) requireActivity().getApplication();
+        mViewModel = new ViewModelProvider(this,
+                new RecipeDetailsViewModelFactory(app.getInjection().getRepository()))
+                .get(RecipeDetailsViewModel.class);
     }
 
     private <T> void handleResponse(Resource<Recipe> response) {

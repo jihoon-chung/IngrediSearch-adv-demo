@@ -22,22 +22,22 @@ android {
         }
     }
 
-//    sourceSets {
-//        String sharedTestDir = 'src/sharedTest/java'
-//        test {
-//            java.srcDir sharedTestDir
-//        }
-//        androidTest {
-//            java.srcDir sharedTestDir
-//        }
-//    }
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
 
-//    testOptions {
-//        unitTests {
-//            includeAndroidResources = true // for Robolectric
-//            // returnDefaultValues = true // Mocking related issue
-//        }
-//    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true // for Robolectric
+            returnDefaultValues = true // Mocking related issue
+        }
+    }
 
 }
 
@@ -70,7 +70,7 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library:$hamcrest_version"
 
     // Mockito
-    def mockito_version = "3.10.0"
+    def mockito_version = '3.11.1'  // 3.11.2 has unknown problem
     testImplementation "org.mockito:mockito-core:$mockito_version"
     androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 
@@ -79,7 +79,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:$robolectric_version"
 
     // androidx.fragment
-    def fragment_version = "1.3.4" // must use for new factory stuff
+    def fragment_version = '1.3.5' // must use for new factory stuff
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version" // FragmentScenario
     implementation "androidx.fragment:fragment:$fragment_version"
 

@@ -3,26 +3,27 @@ package com.demo.ingredisearch.features.details;
 import android.os.Bundle;
 
 import androidx.fragment.app.testing.FragmentScenario;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.demo.ingredisearch.BaseUITest;
 import com.demo.ingredisearch.R;
+import com.demo.ingredisearch.TestData;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-@RunWith(AndroidJUnit4.class)
-public class RecipeDetailsFragmentTest {
+public class RecipeDetailsFragmentTest extends BaseUITest {
 
     @Test
     public void recipeDetailsFragmentInView() {
+        // Arrange (Given)
+        mRemoteDataSource.addRecipes(TestData.recipeDetails01);
 
-        // TODO
-        String recipeId = null;
+        // Act (When)
+        String recipeId = TestData.recipeDetails01.getRecipeId();
         Bundle args = new RecipeDetailsFragmentArgs.Builder(recipeId).build().toBundle();
         FragmentScenario.launchInContainer(RecipeDetailsFragment.class, args, R.style.AppTheme);
 

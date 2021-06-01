@@ -1,6 +1,7 @@
 package com.demo.ingredisearch.repository.sources.favorites;
 
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.demo.ingredisearch.TestData;
 import com.demo.ingredisearch.models.Recipe;
@@ -9,14 +10,15 @@ import com.demo.ingredisearch.repository.FavoritesSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-//@RunWith(AndroidJUnit4.class)
-public class SharedPreferencesFavoritesSourceTest {
+@RunWith(AndroidJUnit4.class)
+public class SharedPreferencesFavoritesSourceUnitTest {
 
     // SUT
     FavoritesSource mFavoritesSource;

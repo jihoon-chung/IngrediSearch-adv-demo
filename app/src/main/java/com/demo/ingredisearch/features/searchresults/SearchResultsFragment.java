@@ -13,14 +13,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demo.ingredisearch.R;
+import com.demo.ingredisearch.RecipeApplication;
 import com.demo.ingredisearch.adapters.RecipeAdapter;
 import com.demo.ingredisearch.models.Recipe;
+import com.demo.ingredisearch.util.EventObserver;
 import com.demo.ingredisearch.util.ViewHelper;
+
+import java.util.List;
 
 public class SearchResultsFragment extends Fragment {
     private RecyclerView mRecyclerView;
@@ -29,6 +34,8 @@ public class SearchResultsFragment extends Fragment {
     private TextView mRetry;
     private ViewHelper mViewHelper;
     private String mQuery;
+
+    private SearchResultsViewModel mViewModel;
 
     @Nullable
     @Override
@@ -40,7 +47,7 @@ public class SearchResultsFragment extends Fragment {
 
         SearchResultsFragmentArgs arguments = SearchResultsFragmentArgs.fromBundle(requireArguments());
         mQuery = arguments.getQuery();
-        mRetry.setOnClickListener(view -> searchRecipes(mQuery));
+        mRetry.setOnClickListener(view -> searchRecipes(mQuery)); // May use LiveData on ViewModel
         ViewHelper.showSubtitle(this, mQuery);
 
         setHasOptionsMenu(true);
@@ -64,7 +71,51 @@ public class SearchResultsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        createViewModel();
+        subscribeObservers();
+
         searchRecipes(mQuery);
+    }
+
+    private void createViewModel() {
+        RecipeApplication app = (RecipeApplication) requireActivity().getApplication();
+        mViewModel = new ViewModelProvider(this, new SearchResultsViewModelFactory(
+                app.getInjection().getRepository()
+        )).get(SearchResultsViewModel.class);
+    }
+
+    private void subscribeObservers() {
+        mViewModel.getRecipes().observe(getViewLifecycleOwner(), recipes -> {
+            if (recipes != null) {
+                handleRecipes(recipes);
+            }
+        });
+
+        mViewModel.isError().observe(getViewLifecycleOwner(),
+                new EventObserver<>(isError -> showError()));
+
+        mViewModel.navToDetails().observe(getViewLifecycleOwner(), new EventObserver<>(
+                this::navigateToRecipeDetails
+        ));
+
+        mViewModel.isLoading().observe(getViewLifecycleOwner(), new EventObserver<>(isLoading -> handleLoading()));
+    }
+
+    private void handleLoading() {
+        mViewHelper.showLoading();
+    }
+
+    private void showError() {
+        mViewHelper.showError();
+    }
+
+    private void handleRecipes(List<Recipe> recipes) {
+        if (recipes.isEmpty()) {
+            mViewHelper.showNoResults();
+        } else {
+            mViewHelper.hideOthers();
+            mAdapter.setRecipes(recipes);
+        }
     }
 
     @Override
@@ -86,30 +137,28 @@ public class SearchResultsFragment extends Fragment {
         mAdapter = new RecipeAdapter(new RecipeAdapter.Interaction() {
             @Override
             public void onRemoveFavorite(@NonNull Recipe recipe) {
-                // TODO
+                mViewModel.unmarkFavorite(recipe);
             }
 
             @Override
             public void onAddFavorite(@NonNull Recipe recipe) {
-                // TODO
+                mViewModel.markFavorite(recipe);
             }
 
             @Override
             public void onClickItem(@NonNull Recipe recipe) {
-                // TODO
-                navigateToRecipeDetails(recipe);
+                mViewModel.requestNavToDetails(recipe);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    private void navigateToRecipeDetails(@NonNull Recipe recipe) {
+    private void navigateToRecipeDetails(@NonNull String recipeId) {
         Navigation.findNavController(requireView()).navigate(
-                SearchResultsFragmentDirections.actionSearchResultsFragmentToRecipeDetailsFragment(recipe.getRecipeId()));
+                SearchResultsFragmentDirections.actionSearchResultsFragmentToRecipeDetailsFragment(recipeId));
     }
 
     public void searchRecipes(String query) {
-        // TODO - temporary
-        mViewHelper.showNoResults();
+        mViewModel.searchRecipes(query);
     }
 }

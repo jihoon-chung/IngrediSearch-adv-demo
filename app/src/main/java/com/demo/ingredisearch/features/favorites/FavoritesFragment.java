@@ -10,22 +10,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demo.ingredisearch.R;
+import com.demo.ingredisearch.RecipeApplication;
 import com.demo.ingredisearch.adapters.RecipeAdapter;
 import com.demo.ingredisearch.models.Recipe;
+import com.demo.ingredisearch.util.EventObserver;
 import com.demo.ingredisearch.util.ViewHelper;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class FavoritesFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
 
     private ViewHelper mViewHelper;
+    private FavoritesViewModel mViewModel;
 
     @Nullable
     @Override
@@ -37,9 +43,6 @@ public class FavoritesFragment extends Fragment {
         ViewHelper.showSubtitle(this, null);
 
         setupRecyclerView();
-
-        // TODO - temporary
-        showNoFavorites();
 
         return root;
     }
@@ -56,24 +59,60 @@ public class FavoritesFragment extends Fragment {
                 mErrorContainer, mNoResultsContainer);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        createViewModel();
+        subscribeObservers();
+
+        mViewModel.load();
+    }
+
+    private void createViewModel() {
+        RecipeApplication app = (RecipeApplication) requireActivity().getApplication();
+        mViewModel = new ViewModelProvider(this, new FavoritesViewModelFactory(
+                app.getInjection().getRepository()
+        )).get(FavoritesViewModel.class);
+    }
+
+    private void subscribeObservers() {
+        mViewModel.getFavorites().observe(getViewLifecycleOwner(), favorites -> {
+            if (favorites != null) {
+                handleFavorites(favorites);
+            }
+        });
+
+        mViewModel.navToDetails().observe(getViewLifecycleOwner(),
+                new EventObserver<>(this::navigateToRecipeDetails));
+    }
+
+    private void handleFavorites(List<Recipe> favorites) {
+        if (favorites.isEmpty()) {
+            mViewHelper.showNoResults();
+        } else {
+            mViewHelper.hideOthers();
+            mAdapter.setRecipes(favorites);
+        }
+    }
+
     private void setupRecyclerView() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAdapter = new RecipeAdapter(new RecipeAdapter.Interaction() {
             @Override
-            public void onRemoveFavorite(@NotNull Recipe item) {
-                // TODO
+            public void onRemoveFavorite(@NotNull Recipe recipe) {
+                mViewModel.removeFavorite(recipe);
             }
 
             @Override
-            public void onAddFavorite(@NotNull Recipe item) {
+            public void onAddFavorite(@NotNull Recipe recipe) {
                 // unused
             }
 
             @Override
             public void onClickItem(@NotNull Recipe recipe) {
-                // TODO
-                navigateToRecipeDetails(recipe.getRecipeId());
+                mViewModel.requestToNavToDetails(recipe.getRecipeId());
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -85,8 +124,4 @@ public class FavoritesFragment extends Fragment {
         );
     }
 
-    // TODO - temporary
-    private void showNoFavorites() {
-        mViewHelper.showNoResults();
-    }
 }

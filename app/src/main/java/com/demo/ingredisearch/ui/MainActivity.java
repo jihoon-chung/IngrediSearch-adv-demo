@@ -3,7 +3,7 @@ package com.demo.ingredisearch.ui;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
         setupNavigationDrawer();
         setSupportActionBar(findViewById(R.id.toolbar));
 
-        mNavController = Navigation.findNavController(this, R.id.myNavHostFragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.myNavHostFragment);
+        mNavController = navHostFragment.getNavController();
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.mainFragment, R.id.searchResultsFragment, R.id.favoritesFragment)
                 .setOpenableLayout(mDrawerLayout)

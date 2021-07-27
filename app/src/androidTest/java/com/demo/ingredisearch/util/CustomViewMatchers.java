@@ -1,16 +1,58 @@
 package com.demo.ingredisearch.util;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.view.View;
 
 import androidx.annotation.IdRes;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.core.app.ApplicationProvider;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+import static org.hamcrest.Matchers.is;
+
 public interface CustomViewMatchers {
+
+    static Matcher<View> withToolbarTitle(@IdRes int id) {
+        Context context = ApplicationProvider.getApplicationContext();
+        return withToolbarTitle(context.getString(id));
+    }
+
+    static Matcher<View> withToolbarTitle(CharSequence title) {
+        return withToolbarTitle(is(title));
+    }
+
+    static Matcher<View> withToolbarTitle(Matcher<? extends CharSequence> matcher) {
+        return new ToolbarTitle(matcher);
+    }
+
+    class ToolbarTitle extends TypeSafeMatcher<View> {
+        private Matcher<? extends CharSequence> matcher;
+
+        public ToolbarTitle(Matcher<? extends CharSequence> matcher) {
+            this.matcher = matcher;
+        }
+
+        @Override
+        protected boolean matchesSafely(View view) {
+            Toolbar toolbar;
+            if (view instanceof Toolbar) {
+                toolbar = (Toolbar) view;
+                return matcher.matches(toolbar.getTitle().toString());
+            }
+            return false;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("toolbar title: ");
+            matcher.describeTo(description);
+        }
+    }
 
     static RecyclerViewMatcher withRecyclerView(@IdRes final int recyclerViewId) {
         return new RecyclerViewMatcher(recyclerViewId);

@@ -3,8 +3,11 @@ package com.demo.ingredisearch.repository.sources.remote;
 import androidx.annotation.NonNull;
 
 import com.demo.ingredisearch.models.Recipe;
+import com.demo.ingredisearch.repository.RemoteDataSource;
 import com.demo.ingredisearch.repository.sources.ResponseCallback;
 import com.demo.ingredisearch.util.Resource;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -14,12 +17,18 @@ import retrofit2.Response;
 
 import static java.util.Collections.emptyList;
 
-public class RecipeApiClient {
+public class RecipeApiClient implements RemoteDataSource {
 
     private static final String TAG = "RecipeApp";
 
-    private ServiceGenerator mServiceGenerator = new ServiceGenerator();
+    private ServiceGenerator mServiceGenerator = getServiceGenerator();
 
+    @NotNull
+    protected ServiceGenerator getServiceGenerator() {
+        return new ServiceGenerator();
+    }
+
+    @Override
     public void searchRecipes(String query, ResponseCallback<List<Recipe>> callback) {
         Call<RecipeSearchResponse> call = mServiceGenerator.getRecipesService(query);
 
@@ -47,6 +56,7 @@ public class RecipeApiClient {
         });
     }
 
+    @Override
     public void searchRecipe(String recipeId, ResponseCallback<Recipe> callback) {
         Call<RecipeResponse> call = mServiceGenerator.getRecipeService(recipeId);
 

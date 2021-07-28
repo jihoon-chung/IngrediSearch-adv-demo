@@ -26,22 +26,22 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-//    sourceSets {
-//        String sharedTestDir = 'src/sharedTest/java'
-//        test {
-//            java.srcDir sharedTestDir
-//        }
-//        androidTest {
-//            java.srcDir sharedTestDir
-//        }
-//    }
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
 
-//    testOptions {
-//        unitTests {
-//            includeAndroidResources = true // for Robolectric
-//            // returnDefaultValues = true // Mocking related issue
-//        }
-//    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true // for Robolectric
+            // returnDefaultValues = true // Mocking related issue
+        }
+    }
 
 }
 

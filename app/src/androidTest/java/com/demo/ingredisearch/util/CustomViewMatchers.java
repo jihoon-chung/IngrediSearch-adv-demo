@@ -8,6 +8,7 @@ import androidx.annotation.IdRes;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.matcher.BoundedMatcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -30,21 +31,41 @@ public interface CustomViewMatchers {
         return new ToolbarTitle(matcher);
     }
 
-    class ToolbarTitle extends TypeSafeMatcher<View> {
+//    class ToolbarTitle extends TypeSafeMatcher<View> {
+//        private Matcher<? extends CharSequence> matcher;
+//
+//        public ToolbarTitle(Matcher<? extends CharSequence> matcher) {
+//            this.matcher = matcher;
+//        }
+//
+//        @Override
+//        protected boolean matchesSafely(View view) {
+//            Toolbar toolbar;
+//            if (view instanceof Toolbar) {
+//                toolbar = (Toolbar) view;
+//                return matcher.matches(toolbar.getTitle().toString());
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public void describeTo(Description description) {
+//            description.appendText("toolbar title: ");
+//            matcher.describeTo(description);
+//        }
+//    }
+
+    class ToolbarTitle extends BoundedMatcher<View, Toolbar> {
         private Matcher<? extends CharSequence> matcher;
 
         public ToolbarTitle(Matcher<? extends CharSequence> matcher) {
+            super(Toolbar.class);
             this.matcher = matcher;
         }
 
         @Override
-        protected boolean matchesSafely(View view) {
-            Toolbar toolbar;
-            if (view instanceof Toolbar) {
-                toolbar = (Toolbar) view;
-                return matcher.matches(toolbar.getTitle().toString());
-            }
-            return false;
+        protected boolean matchesSafely(Toolbar toolbar) {
+            return matcher.matches(toolbar.getTitle().toString());
         }
 
         @Override

@@ -47,7 +47,7 @@ public class MainActivityTest {
 //        onView(withText(R.string.main_title)).check(matches(isDisplayed()));
         onView(withToolbarTitle(R.string.main_title)).check(matches(isDisplayed()));
         onView(withToolbarTitle("IngrediSearch Demo")).check(matches(isDisplayed()));
-        onView(withToolbarTitle(endsWith("demo"))).check(matches(isDisplayed()));
+        onView(withToolbarTitle(endsWith("Demo"))).check(matches(isDisplayed()));
 
         // Matcher<String> is not a subtype of Matcher<CharSequence>
         // Matcher<String> is a subtype of Matcher<? extends CharSequence>
